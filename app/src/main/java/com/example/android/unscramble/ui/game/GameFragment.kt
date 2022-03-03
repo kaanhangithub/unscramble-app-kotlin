@@ -17,6 +17,7 @@
 package com.example.android.unscramble.ui.game
 
 import android.os.Bundle
+import android.util.EventLog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +34,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class GameFragment : Fragment() {
 
 
-    private var currentWordCount = 0
+
     private var currentScrambledWord = "test"
     private val viewModel: GameViewModel by viewModels()
 
@@ -62,9 +63,9 @@ class GameFragment : Fragment() {
         binding.skip.setOnClickListener { onSkipWord() }
         // Update the UI
         updateNextWordOnScreen()
-        binding.score.text = getString(R.string.score, 0)
+        binding.score.text = getString(R.string.score, viewModel.score)
         binding.wordCount.text = getString(
-                R.string.word_count, 0, MAX_NO_OF_WORDS)
+                R.string.word_count, viewModel.currentWordCount, MAX_NO_OF_WORDS)
     }
 
     /*
@@ -87,7 +88,12 @@ class GameFragment : Fragment() {
      * Increases the word count.
      */
     private fun onSkipWord() {
+            if(viewModel.nextWord()) {
+                updateNextWordOnScreen()
+                setErrorTextField(false)
+            }
 
+            else showFinalScoreDialog()
     }
 
     /*
@@ -104,6 +110,7 @@ class GameFragment : Fragment() {
      * restart the game.
      */
     private fun restartGame() {
+        viewModel.reinitializeData()
         setErrorTextField(false)
         updateNextWordOnScreen()
     }
